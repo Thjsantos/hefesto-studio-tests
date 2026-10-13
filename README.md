@@ -1,6 +1,6 @@
 # Hefesto Studio – mobile test automation
 
-[![Tests](https://github.com/Thjsantos/hefesto-studio-tests/actions/workflows/tests.yml/badge.svg)](https://github.com/Thjsantos/hefesto-studio-tests/actions/workflows/tests.yml)
+[![Tests](https://github.com/Thjsantos/hefesto-studio-tests/actions/workflows/tests.yml/badge.svg)](https://github.com/Thjsantos/hefesto-studio-tests/actions/workflows/tests.yml) [Latest test report](https://thjsantos.github.io/hefesto-studio-tests/)
 
 Automated mobile tests for [Hefesto Studio](https://thjsantos.github.io/hefesto-studio/), a catalog of resin figures that sends orders through WhatsApp. The site is a PWA with its own repo: [hefesto-studio](https://github.com/Thjsantos/hefesto-studio).
 
@@ -96,7 +96,10 @@ appium --allow-insecure=uiautomator2:chromedriver_autodownload
 
 ## Reports
 
-Every run writes a self-contained HTML report to `reports/report.html`. When a test fails, a screenshot is attached to the report and also saved in `reports/screenshots/`. On GitHub, the CI run uploads the report as an artifact.
+Every run writes a self-contained HTML report to `reports/report.html`. When a test fails, a screenshot is attached to the report and also saved in `reports/screenshots/`. On GitHub:
+
+- The latest run on `main` is published as a web page: **[latest test report](https://thjsantos.github.io/hefesto-studio-tests/)**.
+- Every CI run (pull requests too) shows a short result summary on its Summary page and uploads the report as a downloadable artifact.
 
 ## Notes from building it
 
