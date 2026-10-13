@@ -27,6 +27,7 @@ Automated tests for the Hefesto Studio website (a catalog of resin figures that 
 - The product page and catalog draw their content after `fetch(products.json)`. Always wait for the element (scale buttons, cards) before reading it. The catalog's WhatsApp link is filled by JavaScript, so wait for a non-empty `href`.
 - HTML collapses repeated spaces, compare displayed names with `display_name`; the WhatsApp message uses the raw name.
 - On the real phone (Appium), `get_attribute("textContent")` returns `None` and `get_attribute("class")` sometimes does too. Use `BasePage.text_content()` and `BasePage.classes()` (read through JavaScript) instead.
+- `--target pwa`: with `no_reset`, Appium does not bring the installed app to the front if its process is still alive from an earlier run (the web context then never appears). Needed: explicit `appActivity` (resolved with adb in `utils/pwa.py`), `forceAppLaunch`, and `appWaitPackage` including `com.android.chrome` (the app's window belongs to Chrome). It looked fine at first only because the app happened to be open already.
 - Samsung phone: USB debugging needs Developer options on (tap Build number 7 times); Auto Blocker can block it. When starting Appium from the Claude shell, `adb` is not on PATH, add `%LOCALAPPDATA%\Android\platform-tools` to PATH and set `ANDROID_HOME` first.
 - Selenium's `.text` returns text after CSS `text-transform` (nav links are uppercase), compare case-insensitively or use `textContent`.
 

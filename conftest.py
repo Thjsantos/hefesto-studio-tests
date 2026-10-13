@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 from selenium import webdriver as selenium_webdriver
 from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.support.ui import WebDriverWait
 
 import config
 from pages.catalog_page import CatalogPage
@@ -53,15 +54,24 @@ def _pwa_driver():
     options.platform_name = "Android"
     options.automation_name = "UiAutomator2"
     options.app_package = pwa.find_package()
+    options.app_activity = pwa.launch_activity(options.app_package)
     options.set_capability("appium:appWaitActivity", "*")
+    # The app's window belongs to Chrome, not to the app's own package.
+    options.set_capability("appium:appWaitPackage", f"{options.app_package},com.android.chrome")
     options.no_reset = True
+    # With no_reset, Appium does not bring an app to the front if its process is still alive from
+    # an earlier run, so force the launch every time.
+    options.set_capability("appium:forceAppLaunch", True)
+    options.set_capability("appium:shouldTerminateApp", True)
     options.new_command_timeout = 300
     options.set_capability("appium:chromedriverAutodownload", True)
     options.set_capability("appium:ensureWebviewsHavePages", True)
     if config.ANDROID_UDID:
         options.udid = config.ANDROID_UDID
     drv = appium_webdriver.Remote(config.APPIUM_URL, options=options)
-    drv.switch_to.context("WEBVIEW_chrome")  # the app's page, instead of the native app window
+    # The app's page, instead of the native app window. The web context appears a moment after launch.
+    WebDriverWait(drv, 30).until(lambda d: "WEBVIEW_chrome" in d.contexts)
+    drv.switch_to.context("WEBVIEW_chrome")
     return drv
 
 
@@ -72,6 +82,11 @@ def _emulated_driver(headless: bool):
         options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
     return selenium_webdriver.Chrome(options=options)
+
+
+@pytest.fixture(scope="session")
+def target(request):
+    return request.config.getoption("--target")
 
 
 @pytest.fixture(scope="session")

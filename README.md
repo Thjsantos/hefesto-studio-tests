@@ -8,13 +8,14 @@ Built with **Python, pytest, Selenium and Appium**, using the **page object patt
 
 ## What is tested
 
-65 tests in three files:
+67 tests in four files:
 
 | File | Covers |
 | --- | --- |
 | `tests/test_catalog.py` | Product cards, starting prices, category filters, search (with and without results), opening a product from a card |
 | `tests/test_product.py` | Name, category and model, scale selector (price and height update), single-price products, WhatsApp quote link and message, gallery limit, YouTube video thumbnail, "not found" page |
 | `tests/test_home_and_layout.py` | Home button, "how to buy" steps, order button, phone layout, no horizontal scroll on every page, burger menu, floating Instagram/WhatsApp buttons |
+| `tests/test_pwa.py` | The web app manifest (standalone display, icons, start page) and, with `--target pwa`, that the installed app really runs in standalone mode (skipped otherwise) |
 
 Tests marked `smoke` are the quick checks that the main pages work.
 
@@ -82,7 +83,7 @@ appium --allow-insecure=uiautomator2:chromedriver_autodownload
 .\.venv\Scripts\python.exe -m pytest
 ```
 
-`--target android` is the default. With more than one device connected, set `ANDROID_UDID` to the serial shown by `adb devices`. Appium downloads the ChromeDriver that matches the Chrome version on the phone.
+`--target android` is the default and opens the site in Chrome. With more than one device connected, set `ANDROID_UDID` to the serial shown by `adb devices`. Appium downloads the ChromeDriver that matches the Chrome version on the phone.
 
 ### Run in the installed app instead of the browser
 

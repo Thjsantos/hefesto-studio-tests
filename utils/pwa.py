@@ -24,6 +24,15 @@ def _shell(*args: str) -> str:
     return subprocess.run(cmd, capture_output=True, text=True, timeout=30).stdout
 
 
+def launch_activity(package: str) -> str:
+    """The activity that opens the app (its launcher icon). Appium needs it to bring the app to the front."""
+    output = _shell("cmd", "package", "resolve-activity", "--brief", "-c", "android.intent.category.LAUNCHER", package)
+    for line in output.splitlines():
+        if line.strip().startswith(package + "/"):
+            return line.strip().split("/", 1)[1]
+    raise RuntimeError(f"Could not find the launcher activity of {package}.")
+
+
 def find_package() -> str:
     """The package of the installed app whose scope is the site under test.
     HEFESTO_PWA_PACKAGE overrides the search."""
@@ -35,5 +44,6 @@ def find_package() -> str:
         if package and f'Authority: "{site.netloc}"' in _shell("dumpsys", "package", package) \
                 and site.path in _shell("dumpsys", "package", package):
             return package
-    raise RuntimeError(f"No installed app found for {config.BASE_URL}. Install it from Chrome first "
-                       "(menu > Add to Home screen > Install), or set HEFESTO_PWA_PACKAGE.")
+    raise RuntimeError(f"No installed app found for {config.BASE_URL}. Check that the phone is listed by "
+                       "`adb devices`, and that the app is installed from Chrome (menu > Install app). "
+                       "Or set HEFESTO_PWA_PACKAGE.")
