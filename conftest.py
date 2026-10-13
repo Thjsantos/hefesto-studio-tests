@@ -18,8 +18,9 @@ REPORTS = Path(__file__).parent / "reports"
 
 
 def pytest_addoption(parser):
-    parser.addoption("--target", choices=["android", "emulated"], default="android",
-                     help="android: real phone through Appium (default). "
+    parser.addoption("--target", choices=["android", "pwa", "emulated"], default="android",
+                     help="android: real phone through Appium, site opened in Chrome (default). "
+                          "pwa: real phone through Appium, site opened in the installed app. "
                           "emulated: desktop Chrome with phone emulation, no phone or Appium needed (used in CI).")
     parser.addoption("--headless", action="store_true", help="Only for --target emulated.")
 
@@ -42,6 +43,28 @@ def _android_driver():
     return appium_webdriver.Remote(config.APPIUM_URL, options=options)
 
 
+def _pwa_driver():
+    """Same phone, but the site runs in the installed app instead of a Chrome tab."""
+    from appium import webdriver as appium_webdriver
+    from appium.options.android import UiAutomator2Options
+    from utils import pwa
+
+    options = UiAutomator2Options()
+    options.platform_name = "Android"
+    options.automation_name = "UiAutomator2"
+    options.app_package = pwa.find_package()
+    options.set_capability("appium:appWaitActivity", "*")
+    options.no_reset = True
+    options.new_command_timeout = 300
+    options.set_capability("appium:chromedriverAutodownload", True)
+    options.set_capability("appium:ensureWebviewsHavePages", True)
+    if config.ANDROID_UDID:
+        options.udid = config.ANDROID_UDID
+    drv = appium_webdriver.Remote(config.APPIUM_URL, options=options)
+    drv.switch_to.context("WEBVIEW_chrome")  # the app's page, instead of the native app window
+    return drv
+
+
 def _emulated_driver(headless: bool):
     options = ChromeOptions()
     options.add_experimental_option("mobileEmulation", {"deviceName": "Pixel 7"})
@@ -53,8 +76,11 @@ def _emulated_driver(headless: bool):
 
 @pytest.fixture(scope="session")
 def driver(request):
-    if request.config.getoption("--target") == "android":
+    target = request.config.getoption("--target")
+    if target == "android":
         drv = _android_driver()
+    elif target == "pwa":
+        drv = _pwa_driver()
     else:
         drv = _emulated_driver(request.config.getoption("--headless"))
     drv.implicitly_wait(0)  # explicit waits only

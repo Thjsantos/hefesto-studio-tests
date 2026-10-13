@@ -84,6 +84,16 @@ appium --allow-insecure=uiautomator2:chromedriver_autodownload
 
 `--target android` is the default. With more than one device connected, set `ANDROID_UDID` to the serial shown by `adb devices`. Appium downloads the ChromeDriver that matches the Chrome version on the phone.
 
+### Run in the installed app instead of the browser
+
+The site is a PWA. If it is installed on the phone (Chrome menu > Install app), the same tests can run inside the installed app instead of a Chrome tab:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest --target pwa
+```
+
+The app is found automatically with `adb`. If it cannot be found, set `HEFESTO_PWA_PACKAGE` to the app's package name (`adb shell pm list packages webapk` lists the installed ones). This mode needs the phone, so CI does not run it.
+
 ## Useful commands
 
 ```powershell
