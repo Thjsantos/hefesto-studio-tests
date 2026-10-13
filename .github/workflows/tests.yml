@@ -41,6 +41,7 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
+      # Also used by the "Publish report" workflow, which puts the report on GitHub Pages.
       - name: Upload HTML report (zip)
         if: always()
         uses: actions/upload-artifact@v4
@@ -48,31 +49,3 @@ jobs:
           name: test-report
           path: reports/
           if-no-files-found: ignore
-
-      - name: Prepare report for GitHub Pages
-        if: always() && github.ref == 'refs/heads/main'
-        run: |
-          mkdir -p site
-          cp reports/report.html site/index.html
-
-      - name: Upload report for GitHub Pages
-        if: always() && github.ref == 'refs/heads/main'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: site/
-
-  publish-report:
-    name: Publish report to GitHub Pages
-    # Only the latest run on main is published. Pull requests keep the zip artifact.
-    if: always() && github.ref == 'refs/heads/main' && needs.emulated.result != 'cancelled' && needs.emulated.result != 'skipped'
-    needs: emulated
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
