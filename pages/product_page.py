@@ -28,10 +28,10 @@ class ProductPage(BasePage):
         return self.visible(self.TITLE).text.strip()
 
     def subtitle(self) -> str:
-        return self.visible(self.SUBTITLE).get_attribute("textContent").strip()
+        return self.text_content(self.visible(self.SUBTITLE)).strip()
 
     def price(self) -> float:
-        return parse_brl(self.visible(self.PRICE).get_attribute("textContent"))
+        return parse_brl(self.text_content(self.visible(self.PRICE)))
 
     def scale_names(self) -> list[str]:
         self.find(self.SCALE_BUTTONS)
@@ -39,7 +39,7 @@ class ProductPage(BasePage):
 
     def selected_scale(self) -> str:
         self.find(self.SCALE_BUTTONS)  # the buttons are drawn after the product data loads
-        selected = [b for b in self.find_all(self.SCALE_BUTTONS) if "on" in b.get_attribute("class").split()]
+        selected = [b for b in self.find_all(self.SCALE_BUTTONS) if "on" in self.classes(b)]
         return selected[0].text.strip() if selected else ""
 
     def select_scale(self, name: str):
@@ -47,12 +47,12 @@ class ProductPage(BasePage):
         for button in self.find_all(self.SCALE_BUTTONS):
             if button.text.strip() == name:
                 self.tap(button)
-                self.wait.until(lambda d: "on" in button.get_attribute("class").split())
+                self.wait.until(lambda d: "on" in self.classes(button))
                 return self
         raise AssertionError(f"No scale button {name!r}")
 
     def height_text(self) -> str:
-        return self.find(self.HEIGHT).get_attribute("textContent").strip()
+        return self.text_content(self.find(self.HEIGHT)).strip()
 
     def quote_link(self) -> tuple[str, str]:
         """(wa.me address, decoded message) of the 'Pedir orçamento' button."""
