@@ -27,19 +27,19 @@ class CatalogPage(BasePage):
 
     def card_categories(self) -> list[str]:
         """The small label above the name, e.g. 'ANIME · MY ANIMATE' -> 'anime'."""
-        return [c.find_element(By.CSS_SELECTOR, "small").get_attribute("textContent").split("·")[0].strip().lower()
+        return [self.text_content(c.find_element(By.CSS_SELECTOR, "small")).split("·")[0].strip().lower()
                 for c in self.cards()]
 
     def card_price(self, name: str) -> float:
         for card in self.cards():
             if card.find_element(By.CSS_SELECTOR, "h3").text.strip() == name:
-                return parse_brl(card.find_element(By.CSS_SELECTOR, ".price").get_attribute("textContent"))
+                return parse_brl(self.text_content(card.find_element(By.CSS_SELECTOR, ".price")))
         raise AssertionError(f"No card named {name!r}")
 
     def card_price_text(self, name: str) -> str:
         for card in self.cards():
             if card.find_element(By.CSS_SELECTOR, "h3").text.strip() == name:
-                return card.find_element(By.CSS_SELECTOR, ".price").get_attribute("textContent")
+                return self.text_content(card.find_element(By.CSS_SELECTOR, ".price"))
         raise AssertionError(f"No card named {name!r}")
 
     def filter_labels(self) -> list[str]:
@@ -50,7 +50,7 @@ class CatalogPage(BasePage):
         for button in self.find_all(self.FILTERS):
             if button.text.strip().lower() == label.lower():
                 self.tap(button)
-                self.wait.until(lambda d: "on" in button.get_attribute("class"))
+                self.wait.until(lambda d: "on" in self.classes(button))
                 return self
         raise AssertionError(f"No filter button {label!r}")
 

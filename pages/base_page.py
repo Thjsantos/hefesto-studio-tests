@@ -35,6 +35,16 @@ class BasePage:
     def visible(self, locator):
         return self.wait.until(EC.visibility_of_element_located(locator))
 
+    def text_content(self, element) -> str:
+        """The element's textContent, ignoring CSS (so text-transform and hidden text do not matter).
+        Read through JavaScript: get_attribute("textContent") returns None on the real phone."""
+        return self.driver.execute_script("return arguments[0].textContent;", element) or ""
+
+    def classes(self, element) -> list[str]:
+        """The element's CSS classes. Read through JavaScript: get_attribute("class") sometimes
+        returns None on the real phone."""
+        return self.driver.execute_script("return Array.from(arguments[0].classList);", element) or []
+
     def tap(self, element):
         """Scroll the element to the middle of the screen first, so the floating buttons
         in the corner never cover it, then tap. The scroll must be instant: the site uses
@@ -54,7 +64,7 @@ class BasePage:
     # ---- menu and floating buttons
     def open_menu(self):
         self.tap(self.visible(self.BURGER))
-        self.wait.until(lambda d: "open" in self.find(self.NAV).get_attribute("class"))
+        self.wait.until(lambda d: "open" in self.classes(self.find(self.NAV)))
 
     def nav_link_texts(self) -> list[str]:
         return [a.text.strip() for a in self.find_all(self.NAV_LINKS) if a.text.strip()]

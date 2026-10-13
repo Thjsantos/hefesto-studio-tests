@@ -18,13 +18,16 @@ Automated tests for the Hefesto Studio website (a catalog of resin figures that 
 - `config.py`, `.env.example` (HEFESTO_URL, APPIUM_URL, ANDROID_UDID), `pytest.ini` (HTML report in `reports/`), `requirements.txt`, `.gitignore`.
 
 ## Status
-- The full suite passed 8 runs in a row with `--target emulated --headless` (65 passed, about 20 s). **Never run on the real phone yet.**
-- Not a git repo yet. **Still to do:** README (purpose, setup on Windows, phone setup, how to run, project layout), GitHub Actions workflow running `pytest --target emulated --headless` (and publishing the HTML report), first commit and public GitHub repo, first run on the phone, fix whatever the real phone shows.
+- The full suite passes (65 tests) both with `--target emulated --headless` (about 20 s) and on the owner's real phone, a Samsung S25+ (SM-S936B), about 30 s, 2 runs in a row.
+- Public repo https://github.com/Thjsantos/hefesto-studio-tests (branch `main`), README done, GitHub Actions workflow `.github/workflows/tests.yml` passing (emulated, uploads the HTML report as an artifact).
+- Nothing left from the original to-do list. Ideas for later: more tests, run-on-phone notes/screenshots in the README, bump the GitHub Actions versions (Node 20 deprecation warning).
 
 ## Lessons learned (keep in mind)
 - The site CSS has `scroll-behavior: smooth`; tapping right after `scrollIntoView` hit the wrong spot. `tap()` scrolls with `behavior: 'instant'`.
 - The product page and catalog draw their content after `fetch(products.json)`. Always wait for the element (scale buttons, cards) before reading it. The catalog's WhatsApp link is filled by JavaScript, so wait for a non-empty `href`.
 - HTML collapses repeated spaces, compare displayed names with `display_name`; the WhatsApp message uses the raw name.
+- On the real phone (Appium), `get_attribute("textContent")` returns `None` and `get_attribute("class")` sometimes does too. Use `BasePage.text_content()` and `BasePage.classes()` (read through JavaScript) instead.
+- Samsung phone: USB debugging needs Developer options on (tap Build number 7 times); Auto Blocker can block it. When starting Appium from the Claude shell, `adb` is not on PATH, add `%LOCALAPPDATA%\Android\platform-tools` to PATH and set `ANDROID_HOME` first.
 - Selenium's `.text` returns text after CSS `text-transform` (nav links are uppercase), compare case-insensitively or use `textContent`.
 
 ## Environment on the owner's PC (Windows 11, PowerShell)
