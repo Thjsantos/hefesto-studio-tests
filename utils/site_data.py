@@ -24,6 +24,15 @@ def parse_brl(text: str) -> float:
     return float(match.group(1).replace(".", "").replace(",", "."))
 
 
+def format_height(value) -> str:
+    """How the site shows a scale's height. The CMS stores a number of centimetres (32 -> '32 cm',
+    27.5 -> '27,5 cm'); older data may still be text such as '32 cm', which is shown as it is."""
+    if value is None or value == "":
+        return ""
+    if isinstance(value, (int, float)):
+        return f"{value:g}".replace(".", ",") + " cm"
+    return str(value).strip()
+
 @dataclass
 class Scale:
     name: str
@@ -78,7 +87,7 @@ def load_products() -> list[Product]:
             cat=p["cat"],
             patreon=p.get("patreon", ""),
             price=p.get("price"),
-            scales=[Scale(s["name"], s["price"], s.get("height", "")) for s in p.get("scales", [])],
+            scales=[Scale(s["name"], s["price"], format_height(s.get("height"))) for s in p.get("scales", [])],
             video=p.get("video", ""),
             photos=len(photos),
             pronta=bool(p.get("pronta")),

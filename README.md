@@ -16,6 +16,7 @@ Built with **Python, pytest, Selenium and Appium**, using the **page object patt
 | `tests/test_product.py` | Name, category and model, scale selector (price and height update), single-price products, WhatsApp quote link and message, gallery limit, YouTube video thumbnail, "not found" page |
 | `tests/test_home_and_layout.py` | Home button, "how to buy" steps, order button, phone layout, no horizontal scroll on every page, burger menu, floating Instagram/WhatsApp buttons |
 | `tests/test_pwa.py` | The web app manifest (standalone display, icons, start page) and, with `--target pwa`, that the installed app really runs in standalone mode (skipped otherwise) |
+| `tests/test_site_data.py` | Unit tests (no browser, no phone) for the helpers that read the site data: height formatting, page addresses, prices |
 
 Tests marked `smoke` are the quick checks that the main pages work.
 
