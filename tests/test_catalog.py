@@ -10,6 +10,12 @@ def test_catalog_lists_every_product(catalog, products):
     assert sorted(catalog.card_names()) == sorted(p.display_name for p in products)
 
 
+def test_catalog_shows_the_newest_products_first(catalog, products):
+    """The CMS adds new products at the end of products.json, the catalog lists them in reverse."""
+    catalog.open()
+    assert catalog.card_names() == [p.display_name for p in reversed(products)]
+
+
 def test_card_shows_the_starting_price(catalog, product):
     catalog.open().wait_for_cards()
     assert catalog.card_price(product.display_name) == product.starting_price
@@ -31,6 +37,13 @@ def test_filter_shows_only_the_chosen_category(catalog, products, category):
     catalog.filter_by(CATEGORY_LABELS[category])
     expected = sorted(p.display_name for p in products_in_category(products, category))
     catalog.wait.until(lambda d: sorted(catalog.card_names()) == expected)
+
+
+def test_filters_keep_the_newest_first_order(catalog, products, category):
+    catalog.open().wait_for_cards()
+    catalog.filter_by(CATEGORY_LABELS[category])
+    expected = [p.display_name for p in reversed(products_in_category(products, category))]
+    catalog.wait.until(lambda d: catalog.card_names() == expected)
 
 
 def test_search_finds_a_product_by_name(catalog, product):
